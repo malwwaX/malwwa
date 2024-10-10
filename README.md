@@ -2,7 +2,7 @@ in order for it to work download setup.bat, setup.py and on releases the malwwa.
 then put all those files together in one folder.
 
 
-before using this you agree to the tos of our discord server.
+before using this you agree to the tos thats in our discord server.
 
 
 

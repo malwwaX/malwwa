@@ -1,15 +1,18 @@
-in order for it to work download setup.bat, setup.py and on releases the malwwa.exe.
-then put all those files together in one folder.
-
-
 before using this you agree to the tos thats in our discord server.
+this script is made for stricly educational purpuses only and shall not be used for iligel things.
+The owner of the script is not responsible for nothing, if you disagree dont use the script and leave our server.
 
 
 
-FIRST open setup.bat this is a shortcut to open setup.py.
-setup.py asks you for you're user id from discord you need this correct for this to work with your discord account.
-then it creates a .json file with your user id in, you always need malwwa.exe and the .json file together in the same folder for this to work.
-now you can open the malwwa.exe .
+First open "SETP 1- Setup.bat" This will automaticly open "Setup.py"
+This will ask you for your discord user id (The user id you gave will only see the channel in discord)
+
+Step 2 open "SETP 2-Create exe.bat" this will create an .exe file. Now this file will be in a new created folder.
+Setp 3 open the malwwa.exe file.
+
+
+this script is made for stricly educational purpuses only and shall not be used for iligel things.
+The owner of the script is not responsible for nothing, if you disagree dont use the script and leave our server.
 
 once it works you can check the server "https://discord.gg/rYF5DFcfY2" with the account you put the user id on and look for you're pc name.
 

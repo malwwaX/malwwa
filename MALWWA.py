@@ -2,7 +2,6 @@ import subprocess
 import sys
 import importlib.util
 
-# List of required modules
 external_modules = [
     "psutil", "requests", "pyautogui",
     "numpy", "pyaudio", "selenium", "cryptography",
@@ -17,11 +16,20 @@ standard_lib_modules = [
 
 # Function to check if a module is available
 def is_module_installed(module_name):
-    module_spec = importlib.util.find_spec(module_name)
-    return module_spec is not None
+    try:
+        module_spec = importlib.util.find_spec(module_name)
+        return module_spec is not None
+    except Exception:
+        return False
 
 # Function to install missing external modules
 def install_modules(modules):
+    # Skip module installation if running as a PyInstaller executable
+    if getattr(sys, 'frozen', False):
+        print("Running as PyInstaller executable. Skipping module installation.")
+        return
+
+    # Install missing modules
     for module in modules:
         if not is_module_installed(module):
             print(f"Installing {module}...")
@@ -29,10 +37,10 @@ def install_modules(modules):
         else:
             print(f"Module {module} is already installed.")
 
-# Check external modules
+# Install external modules only when running as a Python script
 install_modules(external_modules)
 
-# Check standard library modules without installing (just log them)
+# Log standard library modules availability without installing
 for module in standard_lib_modules:
     if is_module_installed(module):
         print(f"Standard library module {module} is available.")
